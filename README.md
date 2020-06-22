@@ -7,7 +7,7 @@
 <b>Purpose:</b> Creating and managing BPT and MBPT </br>
 <b>Core classes:</b> </br>
 
-[BPT](src/standdard/sequential/BPT.java)</br>
+[BPT](src/standard/sequential/BPT.java)</br>
 [MBPT](src/multi/sequential/MBPT.java)</br>
 
 <b>Getting started:</b> you can start with some [examples](src/examples)
