@@ -1,6 +1,6 @@
 # BinaryPartitionTree
 
-<b>BPT:</b> Binary Partition Tree
+<b>BPT:</b> Binary Partition Tree </br>
 <b>MBPT:</b> Multi-feature Binary Partition Tree
 
 <b>Language:</b> Java </br>
