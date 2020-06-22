@@ -1,0 +1,154 @@
+package metric.bricks;
+
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
+import datastructure.Node;
+import utils.Log;
+
+/**
+ * 
+ * Parent of all metrics.
+ * (!) All metric classes must implement the interface 'MetricInterface' and override all its methods.
+ * 
+ */
+public class Metric implements MetricInterface{
+
+	public enum Context{
+		
+		METRIC
+	}
+	
+	/**
+	 * Current position of feature.
+	 */
+	public static int currentFeaturePos = -1;
+
+	/**
+	 * Image of interest
+	 */
+	public BufferedImage img;
+	
+	/**
+	 * Specific parameters of the metric.
+	 */
+	public ArrayList<Double> params = new ArrayList<Double>();
+
+	/**
+	 * Defines which similarity metric to consider
+	 */
+	public TypeOfMetric type;
+
+	/**
+	 *
+	 * Each metric class must be associated to a precise type.
+	 * The type will help the factory to build the right metric object.
+	 *
+	 */
+	public static enum TypeOfMetric{
+		
+		RADIOMETRIC_MIN_MAX,
+		RADIOMETRIC_AVERAGE,
+		VECTORIAL_DISTANCE,
+		PRECISED_ELONGATION,
+		SIMPLE_ELONGATION,
+		FAST_ELONGATION,
+		SMOOTHNESS,
+		FAST_SMOOTHNESS,
+		FAST_COMPACTNESS,
+		NDVI,
+		NDWI,
+		CL_MM_NDVI,
+		CL_MM_NDWI,
+		CL_MM_COMPACTNESS,
+		CL_MM_NDVI_NDWI,
+		CL_MM_FEL_NDVI,
+		CL_MM_FEL_NDVI_NDWI, 
+
+		ORANDOM,
+		OMIN_MAX,
+		OMSE, 
+		OWSDM, 
+		OCOL_CONT_MIN_MAX,
+		OCOL_CONT_MSE, 
+		OCOL_CONT_MSE_LAB,
+		OCOL_CONT_WSDM,
+		
+		OMSE_LAB, 
+		OCONTOUR,
+		OCOL_CONT
+	}
+	
+	/**
+	 * Computes a distance between 'n1' and 'n2'.
+	 * @param n1; should not be null
+	 * @param n2; should not be null
+	 * @return A score (~ distance) between 'n1' and 'n2'.
+	 * 
+	 * @throws NullPointerException if n1 or n2 is null
+	 */
+	@Override
+	public double computeDistances(Node n1, Node n2) {
+	
+		System.err.println(Context.METRIC +"[WARNING] the method 'agat.metric.bricks.MetricInterface.computeDistances(Node n1, Node n2)' is not implemented!");
+		System.exit(0);
+		
+		return Double.MAX_VALUE;
+	}
+
+	/**
+	 * Prepares all the Metric Features (MF) corresponding to the chosen metric.
+	 * @param n; should not be null
+	 * 
+	 * @throws NullPointerException if n is null
+	 */
+	@Override
+	public void initMF(Node n) {
+
+		System.err.println(String.valueOf(Context.METRIC) +"[WARNING] the method 'agat.metric.bricks.MetricInterface.prepareMf(Node n)' is not implemented!");
+		System.exit(0);
+		
+	}
+
+	/**
+	 * Initializes a single parameter value.
+	 * @param metricParam value required for the score computations.
+	 */
+	public void setParam(double metricParam) {
+
+		this.params.set(0, metricParam);
+		StringBuilder paramsInfo = new StringBuilder("[Parameters] ");
+		paramsInfo.append(metricParam +" ");
+		
+		Log.println("METRIC", paramsInfo.toString());
+	}
+	
+	/**
+	 * Initializes the values of the parameters.
+	 * @param metricParams list of values required for the score computations.
+	 */
+	public void setParams(ArrayList<Double> metricParams) {
+
+		this.params = metricParams;
+		StringBuilder paramsInfo = new StringBuilder("[Parameters] ");
+		
+		for(Double param: metricParams) {
+			
+			paramsInfo.append(param +" ");
+		}
+		Log.println("METRIC", paramsInfo.toString());
+	}
+	
+	/**
+	 * Initiates or updates the values of the Metric Features (MF).
+	 * @param n; should not be null
+	 * 
+	 * @throws NullPointerException if n is null
+	 */
+	@Override
+	public void updateMF(Node n) {
+
+		System.err.println(String.valueOf(Context.METRIC) +"[WARNING] the method 'agat.metric.bricks.MetricInterface.updateMF(Node n)' is not implemented!");
+		System.exit(0);
+	}
+}
