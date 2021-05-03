@@ -13,15 +13,8 @@ In the context of image analysis, the Binary Partition Tree (BPT) is a classical
 
 ---
 
-![](fig2.png)
-
----
-
 ![](fig3.png)
 
----
-
-![](fig4.png)
 
 # BinaryPartitionTree
 
