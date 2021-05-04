@@ -31,3 +31,29 @@ In the context of image analysis, the Binary Partition Tree (BPT) is a classical
 <b>Project dependency:</b> 
 [Image](https://github.com/yonmi/Image) </br>
 <b>Getting started:</b> you can start with some [examples](src/examples)
+
+## How to cite
+
+    Jimmy Francky Randrianasoa, Camille Kurtz, Éric Desjardin, Nicolas Passat,
+    Binary Partition Tree construction from multiple features for image segmentation,
+    Pattern Recognition,
+    Volume 84,
+    2018,
+    Pages 237-250,
+    ISSN 0031-3203,
+    https://doi.org/10.1016/j.patcog.2018.07.003.
+    (https://www.sciencedirect.com/science/article/pii/S0031320318302358)
+
+**bibtex**
+
+    @article{RANDRIANASOA2018237,
+    title = {Binary Partition Tree construction from multiple features for image segmentation},
+    journal = {Pattern Recognition},
+    volume = {84},
+    pages = {237-250},
+    year = {2018},
+    issn = {0031-3203},
+    doi = {https://doi.org/10.1016/j.patcog.2018.07.003},
+    url = {https://www.sciencedirect.com/science/article/pii/S0031320318302358},
+    author = {Jimmy Francky Randrianasoa and Camille Kurtz and Éric Desjardin and Nicolas Passat},
+    }
