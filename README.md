@@ -15,8 +15,7 @@ In the context of image analysis, the Binary Partition Tree (BPT) is a classical
 
 ![](fig3.png)
 
-
-# BinaryPartitionTree
+## Usage
 
 <b>BPT:</b> Binary Partition Tree </br>
 <b>MBPT:</b> Multi-feature Binary Partition Tree
@@ -30,6 +29,7 @@ In the context of image analysis, the Binary Partition Tree (BPT) is a classical
 
 <b>Project dependency:</b> 
 [Image](https://github.com/yonmi/Image) </br>
+
 <b>Getting started:</b> you can start with some [examples](src/examples)
 
 ## How to cite
