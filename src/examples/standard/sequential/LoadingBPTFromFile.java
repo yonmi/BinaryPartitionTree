@@ -44,8 +44,8 @@ package examples.standard.sequential;
 import datastructure.Node;
 import datastructure.Tree;
 import standard.sequential.BPT;
-import utils.Formula;
 import utils.TreeVisu;
+import utils.d2.Formula;
 
 /**
  * Example loading a BPT from a file.

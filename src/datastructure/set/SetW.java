@@ -195,7 +195,7 @@ public class SetW implements ListW{
 		
 		for(Adjacency adjacency: this.elements()){
 			
-			System.out.print("\n["+ CONTEXT+this.index +"] adja: "+ adjacency.getIndex() +" rank: ("+ this.getRankOf(adjacency) +") score: "+ adjacency.scores[this.index]);
+			System.out.print("/n["+ CONTEXT+this.index +"] adja: "+ adjacency.getIndex() +" rank: ("+ this.getRankOf(adjacency) +") score: "+ adjacency.scores[this.index]);
 			
 			if(adjacency.previous[this.index] != null) {
 				

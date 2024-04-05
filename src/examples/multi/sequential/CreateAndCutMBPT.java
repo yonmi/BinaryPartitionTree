@@ -44,13 +44,13 @@ package examples.multi.sequential;
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;
 
-import datastructure.CutResult;
 import datastructure.Tree;
 import metric.bricks.Metric.TypeOfMetric;
 import multi.sequential.MBPT;
 import multi.strategy.consensus.bricks.Consensus.ConsensusStrategy;
 import ui.ImFrame;
 import utils.CutBPT;
+import utils.CutResult;
 import utils.ImTool;
 import utils.Log;
 
@@ -76,9 +76,9 @@ public class CreateAndCutMBPT {
 
 		Log.show = true;
 		
-//		String path = "xp//examples//six_regions_9_9.png";
+		String path = "xp//examples//six_regions_9_9.png";
 //		String path = "xp//stbg400//pleiade_stbg.tif";
-		String path = "xp//dataset//42049.png";
+//		String path = "xp//dataset//42049.png";
 		
 		BufferedImage image = ImTool.read(path);
 		

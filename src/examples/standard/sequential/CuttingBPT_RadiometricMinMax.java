@@ -44,11 +44,11 @@ package examples.standard.sequential;
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;
 
-import datastructure.CutResult;
 import datastructure.Tree;
 import standard.sequential.BPT;
 import ui.ImFrame;
 import utils.CutBPT;
+import utils.CutResult;
 import utils.ImTool;
 
 /**

@@ -44,11 +44,11 @@ package examples.standard.parallel;
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;
 
-import datastructure.CutResult;
 import datastructure.Tree;
 import standard.parallel.BPTP;
 import ui.ImFrame;
 import utils.CutBPT;
+import utils.CutResult;
 import utils.ImTool;
 
 /**

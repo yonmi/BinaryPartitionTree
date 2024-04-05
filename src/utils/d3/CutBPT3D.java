@@ -39,7 +39,7 @@
 * The full license is in the file LICENSE, distributed with this software.  
 *****************************************************************************/
 
-package utils;
+package utils.d3;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -48,8 +48,10 @@ import java.util.HashMap;
 import java.util.Random;
 
 import datastructure.Node;
-import datastructure.Tree;
-import utils.d2.LabelMatrix;
+import datastructure.d3.Tree3D;
+import utils.ImTool;
+import utils.Log;
+import utils.ImTool.CubeFace;
 
 /**
  * As a BPT is a hierarchical data structure representation of an image, the objects of interest can be represented in each hierarchy level.
@@ -58,7 +60,7 @@ import utils.d2.LabelMatrix;
  * The BPT cut can be considered as a segmentation method as it provide as a result a partitioned image that could be a segmentation result.
  *
  */
-public class CutBPT {
+public class CutBPT3D {
 	
 	private static final String CONTEXT = "Tree-CUT";
 
@@ -69,49 +71,56 @@ public class CutBPT {
 	 * @param starting number of regions of the first partition to generate and to store in the cut result; should be > 0 and > ending
 	 * @param ending number of regions of the last partition to generate and to store in the cut result; should be > 0 and < starting
 	 * @param step number of regions between two partitions to generate; if step is 0, only one partitioned image corresponding to the starting parameter is generated
-	 * @return a {@link CutResult cut result} containing:
+	 * @return a {@link CutResult3D cut result} containing:
 	 * 
 	 * <li> a set of partitions corresponding to each defined hierarchy level
 	 * <li> a set of nodes corresponding to all regions of each hierarchy level
 	 * 
 	 * @throws NullPointerException if tree is null
 	 */
-	public static CutResult execute(Tree tree, int starting, int ending, int step) {
+	public static CutResult3D execute(Tree3D tree3D, int starting, int ending, int step, CubeFace _cubeFace) {
 		
-		CutResult res = new CutResult(tree);
+		CutResult3D res = new CutResult3D(tree3D);
+		
+		CubeFace cubeFace = _cubeFace;
 		
 		BufferedImage regions;
 		
-		tree.prepareLabelMatrix();
-		LabelMatrix labelMatrix = tree.getLabelMatrix();
+		tree3D.prepareLabelMatrix3D();
+		LabelMatrix3D labelMatrix3D = tree3D.getLabelMatrix3D();
 		
 		/* list of active nodes */
 		ArrayList<Node> activeNodesList = new ArrayList<Node>();
 		
-		int nbLeaves = tree.getNbLeaves();
+		int nbLeaves = tree3D.getNbLeaves();
 
 		/* preparing the leaves and the colors */
-		Node[] nodes = tree.getNodes();
-		HashMap<Integer, Color> randomColors = new HashMap<Integer, Color>();
+		Node[] nodes = tree3D.getNodes();
+//		HashMap<Integer, Color> lut = tree3D.getCube().getLUT();
+		/* TODO use the real color */
+		
+		HashMap<Integer, Color> lut = new HashMap<Integer, Color>();
 		Color color;
 		Random rand = new Random();
+		
 		for(int i = 0; i < nbLeaves; i++) {
 			
 			Node leaf = nodes[i];
-			if(leaf.getSize() > 0) {
+			if(leaf.getNbVoxels() > 0) {
 			
 				activeNodesList.add(leaf);
-				labelMatrix.fill(leaf.getPixels(), leaf.label);
-
-				if(!randomColors.containsKey(leaf.label)) {
+				labelMatrix3D.fill(leaf.getVoxels(), leaf.label);
+				
+				if(!lut.containsKey(leaf.label)) {
 
 					float r = rand.nextFloat();
 					float g = rand.nextFloat();
 					float b = rand.nextFloat();
 
 					color = new Color(r, g, b);
-					randomColors.put(leaf.label, color);
+					lut.put(leaf.label, color);
 				}
+				
 			}
 		}
 		
@@ -123,7 +132,7 @@ public class CutBPT {
 		/* if the number of regions matches the starting */
 		if(starting == nbLeaves || ending == nbLeaves) {
 			
-			regions = ImTool.generateRegions(labelMatrix, randomColors);
+			regions = ImTool.generateFaceofCube(labelMatrix3D, cubeFace, lut); /* TODO 2D results but on XY face -- could be something else */
 			res.add(nbLeaves, regions, activeNodesList);
 			
 			if(step == 0) {
@@ -133,19 +142,19 @@ public class CutBPT {
 		}
 		
 		/* Number of estimated fusions */
-		int nbFusions = tree.getNbLeaves() - 1;
+		int nbFusions = tree3D.getNbLeaves() - 1;
 		int numFusion = 1;
 		
 		/* node merging simulation */
 		int numberOfRegions = nbLeaves;
-		for(int n = nbLeaves; n < tree.getNbNodes(); n++) {
+		for(int n = nbLeaves; n < tree3D.getNbNodes(); n++) {
 			
-			tree.setProgress((numFusion * 100) / nbFusions);
-			Log.println(CONTEXT, tree.getProgress() +"%");
+			tree3D.setProgress((numFusion * 100) / nbFusions);
+			Log.println(CONTEXT, tree3D.getProgress() +"%");
 
 			Node node = nodes[n];
 
-			if(node.getSize() > 0) {
+			if(node.getNbVoxels() > 0) {
 
 				activeNodesList.remove(node.rightNode);
 				activeNodesList.remove(node.leftNode);
@@ -158,12 +167,12 @@ public class CutBPT {
 					for(int i = 0; i < activeNodesList.size(); i++) {
 						
 						Node activeNode = activeNodesList.get(i);
-						labelMatrix.fill(activeNode.getPixels(), activeNode.label);
+						labelMatrix3D.fill(activeNode.getVoxels(), activeNode.label);
 					}
 
 					if(starting == numberOfRegions) {
 
-						regions = ImTool.generateRegions(labelMatrix, randomColors); 
+						regions = ImTool.generateFaceofCube(labelMatrix3D, cubeFace, lut); /* TODO 2D results but on XY face -- could be something else */
 						res.add(numberOfRegions, regions, activeNodesList);
 
 					}
@@ -172,7 +181,7 @@ public class CutBPT {
 
 						if(numberOfRegions % starting % step == 0){
 
-							regions = ImTool.generateRegions(labelMatrix, randomColors); 
+							regions = ImTool.generateFaceofCube(labelMatrix3D, cubeFace, lut); /* TODO 2D results but on XY face -- could be something else */
 							res.add(numberOfRegions, regions, activeNodesList);
 
 						}
@@ -181,16 +190,18 @@ public class CutBPT {
 
 					if(numberOfRegions == ending) {
 
-						regions = ImTool.generateRegions(labelMatrix, randomColors); 
+						regions = ImTool.generateFaceofCube(labelMatrix3D, cubeFace, lut); /* TODO 2D results but on XY face -- could be something else */
 						res.add(numberOfRegions, regions, activeNodesList);
 						return res;
 					}
 				}
-
 				numFusion++;
 			}
 		}
-		tree.endingState();
+		tree3D.endingState();
+		
+		System.out.println("[Tree-CUT] Number of partitions: "+ res.partitions.size());
+		
 		return res;
 	}
 }

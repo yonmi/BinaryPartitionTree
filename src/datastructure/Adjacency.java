@@ -44,6 +44,7 @@ package datastructure;
 import java.util.Objects;
 import datastructure.set.AdjacencySet;
 import metric.bricks.Metric;
+import metric.bricks.d3.Metric3D;
 
 /**
  * An adjacency links two neighboring regions.
@@ -225,6 +226,16 @@ public class Adjacency implements Comparable<Adjacency>{
 	public double computeDistance(Metric metric) {
 		
 		return this.distance = metric.computeDistances(this.node1, this.node2);
+	}
+	
+	/**
+	 * For 3D
+	 * @param metric3D
+	 * @return
+	 */
+	public double computeDistance(Metric3D metric3D) {
+		
+		return this.distance = metric3D.computeDistances(this.node1, this.node2);
 	}
 
 	@Override

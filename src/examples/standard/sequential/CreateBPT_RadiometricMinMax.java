@@ -46,6 +46,7 @@ import java.awt.image.BufferedImage;
 import datastructure.Tree;
 import standard.sequential.BPT;
 import utils.ImTool;
+import utils.SaveBPT;
 import utils.TreeVisu;
 
 /**
@@ -67,5 +68,9 @@ public class CreateBPT_RadiometricMinMax {
 			TreeVisu.display(bpt.getRoot(), null);
 			System.out.println("[Test] BPT Creation succeded!");
 		}
+		
+		bpt.setName("six_regions_3_3_bpt.dot");
+		SaveBPT.toDOT(bpt);
+		System.out.println("[Exportation] dot format saved at "+ path +"/"+ bpt.getName());
 	}
 }

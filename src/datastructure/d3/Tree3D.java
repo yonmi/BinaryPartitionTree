@@ -39,55 +39,32 @@
 * The full license is in the file LICENSE, distributed with this software.  
 *****************************************************************************/
 
-package datastructure;
-
-
-import java.awt.image.BufferedImage;
+package datastructure.d3;
 
 import ch.systemsx.cisd.hdf5.IHDF5Reader;
-import lang.Strings;
-import metric.bricks.Metric;
-import standard.sequential.BPT;
-import utils.d2.LabelMatrix;
+import datastructure.Adjacency;
+import datastructure.Node;
+import metric.bricks.d3.Metric3D;
+import utils.d3.LabelMatrix3D;
+import utils.d3.RGBStruct;
 
-public interface Tree {
+public interface Tree3D {
 	
 	/**
 	 * To determine the neighbors of a region, the type of connectivity has to be known.
 	 * 
 	 * <p>
-	 * <li> CN8 or 8-CN considers all 8 neighbors that a middle pixel can have (*).
-	 * <li> CN4 or 4-CN considers only 4 neighbors corresponding to vertical and horizontal ones (+). </br></br>
-	 * 
-	 * <p>
-	 * Example:
-	 * <pre>
-	 * 1 2 3  |  Neighbors of 5 considering 8-CN: 1, 2, 3, 4, 6, 7, 8, 9 </br>
-	 * 4 5 6  |  Neighbors of 5 considering 4-CN: 2, 4, 6, 8 </br>
-	 * 7 8 9  |
-	 * </pre>
+	 * <li> CN6 or 6-CN considers all faces neighbors that a middle voxel can have.
+	 * <li> CN14 or 14-CN considers only 14 neighbors corresponding to faces and egdes neighbors 
+	 * <li> CN122 or 22-CN all 22 neighbors surrounding the voxel. </br></br>
 	 *
 	 */
 	public enum TypeOfConnectivity{
 		
-		CN8,
-		CN4,
-		ALL;
-
-		/**
-		 * 
-		 * @param text referencing the type
-		 * @return the type corresponding to the text
-		 */
-		public static TypeOfConnectivity valueFrom(String text) {
-
-			if (text.equals(Strings.FOUR_CN)) {
-
-				return TypeOfConnectivity.CN4;
-			}		
-
-			return TypeOfConnectivity.CN8;
-		}
+		CN6,
+		CN14,
+		CN22,
+		ALL; /* ALL means each point will be linked to the others */
 	}
 
 	/**
@@ -146,33 +123,15 @@ public interface Tree {
 
 	/**
 	 * 
-	 * @return the directory where the tree file is (~will be) stored 
+	 * @return the cube to represent
 	 */
-	public String getDirectory();
-
-	/**
-	 * 
-	 * @return the image to represent
-	 */
-	public BufferedImage getImage();
-
-	/**
-	 * 
-	 * @return the path of the image
-	 */
-	public String getImagePath();
+	public RGBStruct getCube();
 
 	/**
 	 * 
 	 * @return the global matrix of labels
 	 */
-	public LabelMatrix getLabelMatrix();
-	
-	/**
-	 * 
-	 * @return the maximum between the width and the height of the image.
-	 */
-	public int getMaxLonger();
+	public LabelMatrix3D getLabelMatrix3D();
 
 	/**
 	 * 
@@ -184,7 +143,7 @@ public interface Tree {
 	 * 
 	 * @return the metric used.
 	 */
-	public Metric getMetric();
+	public Metric3D getMetric3D();
 
 	/**
 	 * 
@@ -228,27 +187,6 @@ public interface Tree {
 	 * @return the list of nodes.
 	 */
 	public Node[] getNodes();
-	
-	/**
-	 * Gathers the points of the leaf from an HDF5 file.
-	 * 
-	 * @param leaf to consider
-	 * @return an arrow of values corresponding to each point regrouped in the leaf
-	 */
-	public int[] getPixels(Node leaf);
-
-	/**
-	 * 
-	 * @return the image partition containing the leaves
-	 */
-	public BufferedImage getPreSegImage();
-
-	/**
-	 * 
-	 * @return the path leading to the image of pre-segmentation
-	 */
-	public String getPreSegPath();
-	
 	
 	/**
 	 * 
@@ -311,7 +249,7 @@ public interface Tree {
 	 * @return true if inside and false if outside
 	 * 
 	 */
-	public boolean isInStudiedAread(int x, int y);
+	public boolean isInStudiedAread(int x, int y, int z);
 
 	/**
 	 * The core process of the BPT creation relies on a binary node merging.
@@ -333,7 +271,7 @@ public interface Tree {
 	 * <p>
 	 * The matrix is initially filled from the pixels (i.e. one pixel, one specific label).
 	 */
-	public void prepareLabelMatrix();
+	public void prepareLabelMatrix3D();
 	
 	/**
 	 * Delete an adjacency from the RAG (Region Adjacency Graph).
@@ -344,26 +282,20 @@ public interface Tree {
 	 * @param adjacency
 	 */
 	public void remove(Adjacency adjacency);
-	
-	/**
-	 * 
-	 * @param dir that will contain the tree file.
-	 */
-	public void setDirectory(String dir);
 
 	/**
 	 * Associate the image to the tree
 	 * 
 	 * @param image to represent
 	 */
-	public void setImage(BufferedImage image);
+	public void setCube(RGBStruct cube);
 
 	/**
 	 * Helps the user to define his/her prior knowledge to consider. 
 	 * 
 	 * @param metric used during the tree construction.
 	 */
-	public void setMetric(Metric metric);
+	public void setMetric3D(Metric3D metric3D);
 
 	/**
 	 * 
@@ -381,9 +313,9 @@ public interface Tree {
 	 * 
  	 * @throws NullPointerException if name or image or preSegImage or connectivity is null
  	 * 
-	 * @see Tree#setParams(String, BufferedImage, BufferedImage, Metric, TypeOfConnectivity) setting the params while specifying the metric to use
+	 * @see Tree3D#setParams(String, BufferedImage, BufferedImage, Metric, TypeOfConnectivity) setting the params while specifying the metric to use
 	 */
-	public void setParams(String name, BufferedImage image, BufferedImage preSegImage, TypeOfConnectivity connectivity);
+	public void setParams(String name, RGBStruct cube, TypeOfConnectivity connectivity);
 
 	/**
 	 * Prepares the tree before growing it up. 
@@ -396,23 +328,9 @@ public interface Tree {
 	 * 
 	 * @throws NullPointerException if name or image or preSegImage or metric or connectivity is null
 	 * 
-	 * @see Tree#setParams(String, BufferedImage, BufferedImage, TypeOfConnectivity) setting the params wile NOT specifying the metric to use
+	 * @see Tree3D#setParams(String, BufferedImage, BufferedImage, TypeOfConnectivity) setting the params wile NOT specifying the metric to use
 	 */
-	public void setParams(String name, BufferedImage image, BufferedImage preSegImage, Metric metric, TypeOfConnectivity connectivity);
-
-	/**
-	 * Affect the initial pre-segmented image
-	 * public 
-	 * @param preSeg image containing the leaves
-	 */
-	public void setPreSegImage(BufferedImage preSeg);
-
-	/**
-	 * Affect the path of the pre-segmented image
-	 * 
-	 * @param preSegPath leading to the pre-segmented image
-	 */
-	public void setPreSegPath(String preSegPath);
+	public void setParams(String name, RGBStruct cube, Metric3D metric3D, TypeOfConnectivity connectivity);
 
 	/**
 	 * Affect the progression

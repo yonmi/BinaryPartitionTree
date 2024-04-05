@@ -84,6 +84,7 @@ public class Strings {
 
 	public static final String RAG = "RAG";	
 	public static final String REGIONS = "Regions";
+	public static final String RGB_CUBE = "RGB Cube";
 	
 	public static final String STARTING_TO_GROW = "Starting to grow";
 	public static final String STARTING_TREE_CREATION = "Starting tree creation";
@@ -114,7 +115,5 @@ public class Strings {
 	public static final String VAR_SOURCE = "source";
 	public static final String VAR_STRUCTURE = "structure";
 	public static final String VAR_TIME_OF_CREATION_MS = "time_ms";
-	public static final String VAR_TIME_OF_CREATION_S = "time_s";
-	
-	
+	public static final String VAR_TIME_OF_CREATION_S = "time_s";	
 }

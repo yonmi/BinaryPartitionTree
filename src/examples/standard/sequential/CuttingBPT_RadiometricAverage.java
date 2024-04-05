@@ -44,7 +44,6 @@ package examples.standard.sequential;
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;
 
-import datastructure.CutResult;
 import datastructure.Tree;
 import metric.color.Omselab;
 import metric.color.Owsdm;
@@ -58,6 +57,7 @@ import metric.combination.Ocolcont;
 import standard.sequential.BPT;
 import ui.ImFrame;
 import utils.CutBPT;
+import utils.CutResult;
 import utils.ImTool;
 import utils.Log;
 

@@ -54,13 +54,13 @@ import datastructure.Node;
 import datastructure.Node.TypeOfNode;
 import datastructure.set.SetOfAdjacencies;
 import datastructure.set.SetW;
+import datastructure.set.AdjacencySet.OptimalOption;
 import lang.Strings;
 import metric.bricks.Metric.TypeOfMetric;
 import multi.strategy.consensus.bricks.Consensus;
 import multi.strategy.consensus.bricks.Consensus.ConsensusStrategy;
 import multi.strategy.consensus.bricks.ConsensusFactory;
 import standard.sequential.BPT;
-import standard.sequential.BPT.TypeOfConnectivity;
 import utils.ImTool;
 import utils.Log;
 
@@ -99,6 +99,11 @@ public class MBPT extends BPT{
 	 * Regrouping all listW associating the images to all metrics.
 	 */
 	public ArrayList<ListW> listOfLists;
+	
+	/**
+	 * Precise if the optimal distance value to consider for mergin nodes is the MAXIMUM or the MINIMUM.
+	 */
+	private OptimalOption optimalOption = OptimalOption.MINIMUM; // by default
 	
 	/**
 	 * Creates an empty multi-featuring binary partition tree.
@@ -425,7 +430,7 @@ public class MBPT extends BPT{
 		this.preSegImage = preSegImage;
 		this.connectivity = connectivity;
 		
-		this.setOfAdjacencies = new SetOfAdjacencies();
+		this.setOfAdjacencies = new SetOfAdjacencies(this.optimalOption);
 		
 		Log.show = true;
 		Log.println(context, Strings.IMAGE +"=: "+ ImTool.getNameOf(image) +" ("+ image.getWidth() +"x"+ image.getHeight() +")");

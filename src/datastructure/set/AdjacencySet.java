@@ -46,6 +46,12 @@ import metric.bricks.Metric;
 
 public interface AdjacencySet {
 	
+	public enum OptimalOption {
+		
+		MINIMUM,
+		MAXIMUM;
+	}
+	
 	/**
 	 * Adds the specific adjacency in the set.
 	 * 
@@ -104,5 +110,11 @@ public interface AdjacencySet {
 	 * @return the number of elements in the set
 	 */
 	public int size();
+	
+	/**
+ 	 * Allowing to know if the optimal value is the MINIMAL or the MAXIMAL.
+	 * @param optimalOption
+	 */
+	public void setOptimalOption(OptimalOption optimalOption);
 
 }

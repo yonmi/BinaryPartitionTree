@@ -61,17 +61,18 @@ import datastructure.Node;
 import datastructure.Tree;
 import datastructure.Node.TypeOfNode;
 import datastructure.set.AdjacencySet;
+import datastructure.set.AdjacencySet.OptimalOption;
 import datastructure.set.SetOfAdjacencyBuckets;
 import lang.Strings;
 import metric.bricks.Metric;
 import metric.bricks.MetricFactory;
 import metric.bricks.Metric.TypeOfMetric;
 import metric.color.Ominmax;
-import utils.Formula;
 import utils.ImTool;
-import utils.LabelMatrix;
 import utils.Log;
-import utils.SegmentByConnexityRaw;
+import utils.d2.Formula;
+import utils.d2.LabelMatrix;
+import utils.d2.SegmentByConnexityRaw;
 
 
 /**
@@ -85,7 +86,7 @@ import utils.SegmentByConnexityRaw;
  * Two similar regions are merged according to a user defined metric.
  * 
  */
-public class BPT implements Tree, Serializable{
+public class BPT<T> implements Tree, Serializable{
 
 	/**
 	 * 
@@ -243,44 +244,17 @@ public class BPT implements Tree, Serializable{
 	 * The amount of time, in s, needed for the BPT creation. 
 	 */
 	public long timeS;
-	
+
 	/**
-	 * To determine the neighbors of a region, the type of connectivity has to be known.
 	 * 
-	 * <p>
-	 * <li> CN8 or 8-CN considers all 8 neighbors that a middle pixel can have (*).
-	 * <li> CN4 or 4-CN considers only 4 neighbors corresponding to vertical and horizontal ones (+). </br></br>
-	 * 
-	 * <p>
-	 * Example:
-	 * <pre>
-	 * 1 2 3  |  Neighbors of 5 considering 8-CN: 1, 2, 3, 4, 6, 7, 8, 9 </br>
-	 * 4 5 6  |  Neighbors of 5 considering 4-CN: 2, 4, 6, 8 </br>
-	 * 7 8 9  |
-	 * </pre>
-	 *
 	 */
-	public enum TypeOfConnectivity{
-		
-		CN8,
-		CN4;
+	private ArrayList<T> valueSet;
 
-		/**
-		 * 
-		 * @param text referencing the type
-		 * @return the type corresponding to the text
-		 */
-		public static TypeOfConnectivity valueFrom(String text) {
-
-			if (text.equals(Strings.FOUR_CN)) {
-
-				return TypeOfConnectivity.CN4;
-			}		
-
-			return TypeOfConnectivity.CN8;
-		}
-	}
-
+	/**
+	 * Precise if the optimal distance value to consider for mergin nodes is the MAXIMUM or the MINIMUM.
+	 */
+	private OptimalOption optimalOption = OptimalOption.MINIMUM; // by default
+	
 	/**
 	 * Prepares an empty tree.
 	 * 
@@ -312,7 +286,7 @@ public class BPT implements Tree, Serializable{
 	 * @param image must not be null
 	 * @throws NullPointerException if image is null
 	 * 
-	 * @see BPT#BPT() prepares an empty BPT creation
+	 * @see BPT#BPT() prepares an empty BPT creationnbGrayLevel][nbGray][256];
 	 * @see BPT#BPT(String) prepares a BPT to be re-grown from a HDF5 file.
 	 * @see BPT#BPT(BufferedImage, TypeOfConnectivity) prepares a BPT creation from one image while precising the neighbor type of connectivity
 	 */
@@ -432,6 +406,21 @@ public class BPT implements Tree, Serializable{
 	}
 
 	/**
+	 * 
+	 * @param valueSet
+	 */
+	public BPT(ArrayList<T> valueSet) {
+		
+		this.processName = Strings.PLANTING_A_SEED;
+		this.valueSet = valueSet;
+		this.image = null;
+		this.imgPath = null;
+		this.directory = null;
+		this.connectivity = TypeOfConnectivity.ALL; // all points are connected each other
+		Log.println(context, Strings.CONNEXITY +": "+ this.connectivity);
+	}
+
+	/**
 	 * Accepts and records a link between two neighboring regions in the Region Adjacency Graph (RAG).
 	 * 
 	 * <p>
@@ -464,81 +453,111 @@ public class BPT implements Tree, Serializable{
 		
 		/* Create adjacency edges between the leaves */
 		Log.println(Strings.RAG, Strings.CREATING_ADJACENCIES);
-		this.setOfAdjacencies = new SetOfAdjacencyBuckets();
+		this.setOfAdjacencies = new SetOfAdjacencyBuckets(this.optimalOption);
 		
 		this.nbNodes = 0;
 		while(this.nbNodes < this.nbLeaves) {
 			
 			Node leaf = this.nodes[this.nbNodes];
 			
-			ArrayList<Point> listOfPixels = leaf.getPixels();
-			for(int ip = 0; ip < listOfPixels.size(); ip++){
+			if(this.image != null) {
 				
-				Point pixel = listOfPixels.get(ip);
+				this.createRAGFromImage(leaf);
 			
-				int xPixel = pixel.x;
-				int yPixel = pixel.y;
-				int labelPixel = this.labelMatrix.getLabel(xPixel, yPixel);
-				Node leafContainingPixel = this.nodes[labelPixel];
-				
-				if(this.connectivity == TypeOfConnectivity.CN8) {
+				/* Add all new adjacencies in the RAG */
+				for(Adjacency adja: this.adjacenciesBuffer) {
 					
-					/* 8 connectivities */
-					for(int yNeighbor = yPixel-1; yNeighbor <= yPixel+1; yNeighbor++) {
-						for(int xNeighbor = xPixel-1; xNeighbor <= xPixel+1; xNeighbor++) {
-							
-							this.treat(leafContainingPixel, pixel, xPixel, yPixel, labelPixel, xNeighbor, yNeighbor);
-						}
-					}
-				}else {
-	
-					/* 4 connectivities */
-					int[][] coords = new int[4][2];
-					coords[0][0] = xPixel;
-					coords[0][1] = yPixel - 1;
-					coords[1][0] = xPixel - 1;
-					coords[1][1] = yPixel;
-					coords[2][0] = xPixel + 1;
-					coords[2][1] = yPixel;
-					coords[3][0] = xPixel;
-					coords[3][1] = yPixel + 1;
-					
-					for(int i = 0; i < coords.length; i++) {
-	
-						int xNeighbor = coords[i][0];
-						int yNeighbor = coords[i][1];
-						this.treat(leafContainingPixel, pixel, xPixel, yPixel, labelPixel, xNeighbor, yNeighbor);
-					}
+					this.add(adja); /* The distance values associated to each adjacency are computed while adding then. */
 				}
+				this.adjacenciesBuffer.clear();
+				 	
+			} else {
+				
+				this.createRAGFromValueSet(leaf);
 			}
 			
 			this.nbNodes++;
 		}
 		this.nbInitialAdjacencies = this.getNbAdjacencies();
-/*		for(int i = 0; i < this.nbLeaves; ++i) {
-			
-			int perimeter = this.nodes[i].perimeter;
-			System.out.println("Perimeter of n-"+ i +": "+ perimeter);
-			
-			System.out.println("For each regions: ");
-			for(Entry<Node, Adjacency> entry: this.nodes[i].listOfNeighbors.entrySet()) {
-				
-				Adjacency adjacency = entry.getValue();
-				System.out.println("adja-"+ adjacency.getIndex() +" frontier: "+ adjacency.frontier);
-			}
-		}
- */	
-		/* Add all new adjacencies in the RAG */
-		for(Adjacency adja: this.adjacenciesBuffer) {
-			
-			this.add(adja);
-		}
-		this.adjacenciesBuffer.clear();
 		
 		long ragEndingTime = System.nanoTime();
 		long ragTimeMs = (ragEndingTime - ragStartingTime)/1000000;
 		long ragTimeS = ragTimeMs / 1000;
 		Log.println(Strings.RAG, Strings.TIME_OF_CREATION +": "+ ragTimeMs +" ms | "+ ragTimeS +" s");
+	}
+
+	/**
+	 * Create a RAG from a ValueSet.
+	 * @param leaf
+	 */
+	private void createRAGFromValueSet(Node leaf) {
+		// TODO Auto-generated method stub
+		
+		switch(this.connectivity) {
+			
+		case ALL: // Connect each node to all the others
+			
+			for(int lid = 0; lid < this.nbLeaves; ++lid) {
+				
+				Node neighbor = this.nodes[lid];
+				if(neighbor != leaf) { // No self link
+					
+					this.add(new Adjacency(leaf, neighbor));
+				}
+			}
+			break;
+		
+		default:
+			System.exit(1); // Nothing else, only ALL is allowed.
+		}
+	}
+
+	/**
+	 * Create a RAG from an image.
+	 * @param leaf
+	 */
+	private void createRAGFromImage(Node leaf) {
+
+		ArrayList<Point> listOfPixels = leaf.getPixels();
+		for(int ip = 0; ip < listOfPixels.size(); ip++){
+			
+			Point pixel = listOfPixels.get(ip);
+		
+			int xPixel = pixel.x;
+			int yPixel = pixel.y;
+			int labelPixel = this.labelMatrix.getLabel(xPixel, yPixel);
+			Node leafContainingPixel = this.nodes[labelPixel];
+			
+			if(this.connectivity == TypeOfConnectivity.CN8) {
+				
+				/* 8 connectivities */
+				for(int yNeighbor = yPixel-1; yNeighbor <= yPixel+1; yNeighbor++) {
+					for(int xNeighbor = xPixel-1; xNeighbor <= xPixel+1; xNeighbor++) {
+						
+						this.treat(leafContainingPixel, pixel, xPixel, yPixel, labelPixel, xNeighbor, yNeighbor);
+					}
+				}
+			}else {
+
+				/* 4 connectivities */
+				int[][] coords = new int[4][2];
+				coords[0][0] = xPixel;
+				coords[0][1] = yPixel - 1;
+				coords[1][0] = xPixel - 1;
+				coords[1][1] = yPixel;
+				coords[2][0] = xPixel + 1;
+				coords[2][1] = yPixel;
+				coords[3][0] = xPixel;
+				coords[3][1] = yPixel + 1;
+				
+				for(int i = 0; i < coords.length; i++) {
+
+					int xNeighbor = coords[i][0];
+					int yNeighbor = coords[i][1];
+					this.treat(leafContainingPixel, pixel, xPixel, yPixel, labelPixel, xNeighbor, yNeighbor);
+				}
+			}
+		}
 	}
 
 	/**
@@ -557,6 +576,62 @@ public class BPT implements Tree, Serializable{
 	public void defineLeaves() {
 		
 		int estimatedNbLeaves = labelMatrix.getNbRegions() + labelMatrix.getNbRegions() - 1;
+		
+		if(this.image != null) {
+			
+			this.defineLeavesFromImage(estimatedNbLeaves);
+			
+		}else {
+			
+			this.defineLeavesFromValueSet(estimatedNbLeaves);
+		}
+	}
+
+	/**
+	 * Define leaves from a value set
+	 * @param estimatedNbLeaves
+	 */
+	private void defineLeavesFromValueSet(int estimatedNbLeaves) {
+		
+		/* TODO No preset for now */
+		
+		/* Prepare the list of leaves */
+		this.nodes = new Node[estimatedNbLeaves];
+		Log.println(context, Strings.NB_NODES_TO_CREATE +": "+ this.nodes.length +" (including leaves)");
+		Log.println(context, Strings.NB_LEAVES_TO_CREATE +": "+ this.labelMatrix.getNbRegions());
+		
+		/* Create leaves */
+		for(int i = 0; i < this.labelMatrix.getNbRegions(); i++) {
+			
+			int nodeName = this.labelMatrix.getLabel(i, 0); // 0 here because we only have one dimension
+			Node leaf = this.nodes[nodeName];
+
+			/* Create the leaf if it does not exist */
+			if(leaf == null) {
+
+				leaf = new Node(nodeName);
+				leaf.label = nodeName; 
+				leaf.addValue(this.valueSet.get(i)); // should be done before initializing the metric
+				this.metric.initMF(leaf); /* the features will be initialized from the stored values */
+				this.nodes[nodeName] = leaf;
+				this.nbLeaves++;
+			}				
+			leaf.type = TypeOfNode.LEAF;
+			
+			/* Take mark of the size -- not really useful for now */
+			int lsize = leaf.getSize();
+			if(this.biggestLeafSize < lsize) {
+				
+				this.biggestLeafSize = lsize;
+			}
+		}
+	}
+
+	/**
+	 * Define leaves from image.
+	 * @param estimatedNbLeaves
+	 */
+	private void defineLeavesFromImage(int estimatedNbLeaves) {
 		
 		if(this.preSegImage != null){
 			
@@ -836,7 +911,7 @@ public class BPT implements Tree, Serializable{
 		
 		this.processName = Strings.CREATING_ADJACENCIES;
 		this.createRAG();
-		//System.exit(0);
+		
 		Log.println(context, Strings.NB_ADJACENCIES_GENERATED +": "+ this.nbInitialAdjacencies);
 		
 		this.processName = Strings.MERGING_NODES;
@@ -847,11 +922,7 @@ public class BPT implements Tree, Serializable{
 		this.timeS = this.timeMs / 1000;
 		Log.println(context, Strings.NB_REMAINING_ADJACENCIES +": "+ this.getNbAdjacencies());
 		Log.println(context, Strings.NB_NODES_CREATED +": "+ this.nbNodes);		
-		Log.println(context, Strings.TREE_CREATION_IN +" "+ this.timeMs +" ms ("+ this.timeS +" s)\n");
-		
-/*		System.out.println("colour: ["+ ((Ocolcont) this.metric).ocolMinScore +", "+ ((Ocolcont) this.metric).ocolMaxScore +"]");
-		System.out.println("contour: ["+ ((Ocolcont) this.metric).ocontMinScore +", "+ ((Ocolcont) this.metric).ocontMaxScore +"]");
-		System.exit(0); */
+		Log.println(context, Strings.TREE_CREATION_IN +" "+ this.timeMs +" ms ("+ this.timeS +" s)/n");
 		
 		this.processName = Strings.FINALIZING;
 		this.ended = true;
@@ -906,6 +977,7 @@ public class BPT implements Tree, Serializable{
 			Log.println(context +"_FUSION", this.progress +"%");
 			
 			Adjacency potentialAdjacency = this.setOfAdjacencies.optimalAdjacency();
+			Log.println(context +"_FUSION", "Optimal Score: "+ potentialAdjacency.distance);
 	
 			/* Create a new node */
 			Node leftNode = potentialAdjacency.node1;
@@ -994,9 +1066,32 @@ public class BPT implements Tree, Serializable{
 	@Override
 	public void prepareLabelMatrix() {
 		
+		if(this.image != null) {
+			
+			this.prepareLabelMatrixFromImage();
+			
+		} else {
+			
+			this.preapareLabelMatrixFromValueSet();
+		}
+	}
+
+	/**
+	 * Label Matrix from a value set
+	 */
+	private void preapareLabelMatrixFromValueSet() {
+
+		this.labelMatrix = new LabelMatrix(this.valueSet.size());		
+	}
+
+	/**
+	 * Label Matrix from an image
+	 */
+	private void prepareLabelMatrixFromImage() {
+
 		this.labelMatrix = ImTool.getLabelMatrixOf(this.image);
 	}
-	
+
 	/**
 	 * Regenerate a BPT tree from an HDF5 file by rebuilding 
 	 * the tree in a bottom-up fashion from a file.
@@ -1009,7 +1104,7 @@ public class BPT implements Tree, Serializable{
 	 */
 	private void regrow() {
 		
-		this.setOfAdjacencies = new SetOfAdjacencyBuckets();
+		this.setOfAdjacencies = new SetOfAdjacencyBuckets(this.optimalOption);
 		
 		this.processName = Strings.STARTING_TO_GROW;
 		Log.println(context, Strings.STARTING_TREE_CREATION);	
@@ -1088,7 +1183,7 @@ public class BPT implements Tree, Serializable{
 		long regrowTimeS = regrowTimeMs / 1000;
 		Log.println(context, Strings.NB_ADJACENCIES_GENERATED +": "+ this.getNbAdjacencies());
 		Log.println(context, Strings.NB_NODES_CREATED +": "+ (leafIndex + numFusion));		
-		Log.println(context, Strings.TREE_CREATION_IN +" "+ regrowTimeMs +" ms ("+ regrowTimeS +" s)\n");
+		Log.println(context, Strings.TREE_CREATION_IN +" "+ regrowTimeMs +" ms ("+ regrowTimeS +" s)/n");
 		
 		this.processName = Strings.FINALIZING;
 		this.ended = true;
@@ -1243,5 +1338,19 @@ public class BPT implements Tree, Serializable{
 				}
 			}
 		}
+	}
+
+	public void setConnectivity(datastructure.Tree.TypeOfConnectivity connectivity) {
+
+		this.connectivity = connectivity;
+	}
+
+	/**
+	 * Telling if the optimal value is the MINIMUM or the MAXIMUM value.
+	 * @param optimalOption
+	 */
+	public void setOptimalOption(OptimalOption optimalOption) {
+
+		this.optimalOption = optimalOption;
 	}
 }

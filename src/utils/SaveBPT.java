@@ -52,6 +52,7 @@ import datastructure.Node;
 import datastructure.Tree;
 import lang.Strings;
 import metric.bricks.Metric;
+import utils.d2.Formula;
 
 /**
  * A BPT can be saved in the disk.
@@ -93,9 +94,9 @@ public class SaveBPT {
 		/* prepare the first file containing informations */
 		try {
 
-			String syllabus[] = tree.getName().split("\\.");
+			String syllabus[] = tree.getName().split("//.");
 			String extension = syllabus[syllabus.length-1];
-			String csvFileName = tree.getName().split("\\."+extension)[0] +".csv";
+			String csvFileName = tree.getName().split("//."+extension)[0] +".csv";
 			PrintWriter writer = new PrintWriter(tree.getDirectory() +"//"+ csvFileName, "UTF-8");
 			
 			String source = "pixels";
@@ -116,11 +117,16 @@ public class SaveBPT {
 			}
 			
 			writer.println(Strings.NAME + separator + tree.getName());
-			writer.println(Strings.IMAGE + separator + ImTool.getNameOf(img));
-			writer.println(Strings.VAR_IMAGE_PATH + separator + ImTool.getPathOf(img));
-			writer.println(Strings.IMAGE_SIZE + separator + img.getWidth() +"x"+ img.getHeight());
-			writer.println(Strings.VAR_PRESEG_PATH + separator + tree.getPreSegPath());			
-			writer.println(Strings.NB_BANDS + separator + ImTool.getNbBandsOf(img) +"");
+			
+			if(img != null) {
+			
+				writer.println(Strings.IMAGE + separator + ImTool.getNameOf(img));
+				writer.println(Strings.VAR_IMAGE_PATH + separator + ImTool.getPathOf(img));
+				writer.println(Strings.IMAGE_SIZE + separator + img.getWidth() +"x"+ img.getHeight());
+				writer.println(Strings.VAR_PRESEG_PATH + separator + tree.getPreSegPath());			
+				writer.println(Strings.NB_BANDS + separator + ImTool.getNbBandsOf(img) +"");
+			}
+			
 			writer.println(Strings.DIRECTORY + separator + tree.getDirectory());
 			writer.println(Strings.METRIC + separator + metricInfo);
 			writer.println(Strings.CONNEXITY + separator + tree.getConnectivity());
@@ -145,7 +151,7 @@ public class SaveBPT {
 			tree.setProgress(0);
 			PrintWriter writer = new PrintWriter(tree.getDirectory() +"//"+ tree.getName(), "UTF-8");
 			
-			writer.print("digraph bpt{");
+			writer.print("strict graph bpt{");
 			
 			Node[] nodes =  tree.getNodes();
 			for(int n = 0; n < nodes.length; n++) {
@@ -163,8 +169,8 @@ public class SaveBPT {
 
 				if(node.leftNode != null) {
 					
-					writer.print(node.name +" -> "+ left.name +";");
-					writer.print(node.name +" -> "+ right.name +";");
+					writer.print(node.name +" -- "+ left.name +";");
+					writer.print(node.name +" -- "+ right.name +";");
 					
 				}
 			}
@@ -216,9 +222,9 @@ public class SaveBPT {
 		/* prepare the first file containing informations */
 		try {
 
-			String syllabus[] = tree.getName().split("\\.");
+			String syllabus[] = tree.getName().split("//.");
 			String extension = syllabus[syllabus.length-1];
-			String csvFileName = tree.getName().split("\\."+extension)[0] +".csv";
+			String csvFileName = tree.getName().split("//."+extension)[0] +".csv";
 			PrintWriter writer = new PrintWriter(tree.getDirectory() +"//"+ csvFileName, "UTF-8");
 			
 			String source = "pixels";
@@ -266,52 +272,52 @@ public class SaveBPT {
 			
 			tree.startingState();
 			tree.setProgress(0);
-			PrintWriter writer = new PrintWriter(tree.getDirectory() +"//"+ tree.getName() +".xml", "UTF-8");
-			
-			writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-						 "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
-						 "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
-						 "    xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
-						 "     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
-						 "<graph id=\"G\" edgedefault=\"undirected\">");
-			
-			Node[] nodes =  tree.getNodes();
+			try (PrintWriter writer = new PrintWriter(tree.getDirectory() +"//"+ tree.getName() +".xml", "UTF-8")) {
+				writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>/n" + 
+							 "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"/n" + 
+							 "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance/n" + 
+							 "    xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns/n" + 
+							 "     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">/n" + 
+							 "<graph id=\"G\" edgedefault=\"undirected\">");
+				
+				Node[] nodes =  tree.getNodes();
 
-			/* Store the leaves */
-			int lindex = 0;
-			for(lindex = 0; lindex < tree.getNbLeaves(); ++lindex) {
-				
-				writer.println("	<node id=\""+ lindex +"\"/>");
-			}
-			
-			
-			/* Store the nodes and the edges */
-			for(int n = lindex; n < nodes.length; n++) {
-				
-				tree.setProgress((100 * n) / nodes.length);
-
-				Node node = nodes[n];
-				
-				if(node == null) {
-					break;
-				}
-				
-				Node left = node.leftNode;
-				Node right = node.rightNode;
-
-				if(node.leftNode != null) {
+				/* Store the leaves */
+				int lindex = 0;
+				for(lindex = 0; lindex < tree.getNbLeaves(); ++lindex) {
 					
-					writer.println("	<node id=\""+ n +"\"/>");
-					writer.println("	<edge source=\""+ node.name +"\" target=\""+ left.name +"\"/>");
-					writer.println("	<edge source=\""+ node.name +"\" target=\""+ right.name +"\"/>");
+					writer.println("	<node id=/"+ lindex +"//>");
 				}
+				
+				
+				/* Store the nodes and the edges */
+				for(int n = lindex; n < nodes.length; n++) {
+					
+					tree.setProgress((100 * n) / nodes.length);
+
+					Node node = nodes[n];
+					
+					if(node == null) {
+						break;
+					}
+					
+					Node left = node.leftNode;
+					Node right = node.rightNode;
+
+					if(node.leftNode != null) {
+						
+						writer.println("	<node id=\""+ n +"\"/>");
+						writer.println("	<edge source=\""+ node.name +"\" target=\""+ left.name +"\"/>");
+						writer.println("	<edge source=\""+ node.name +"\" target=\""+ right.name +"\"/>");
+					}
+				}
+				
+				writer.println("  </graph>/n" + 
+							   "</graphml>");
+				
+				/* close the writer */
+				writer.close();
 			}
-			
-			writer.println("  </graph>\n" + 
-						   "</graphml>");
-			
-			/* close the writer */
-			writer.close();
 			
 			tree.endingState();
 			success2 = true;

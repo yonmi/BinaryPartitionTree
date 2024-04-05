@@ -50,6 +50,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import standard.parallel.BPTP.Side;
+import utils.d3.Voxel;
 
 
 /**
@@ -142,6 +143,12 @@ public class Node implements Serializable, Comparable<Node>{
 	 * All pixels contained in the region.
 	 */
 	public ArrayList<Point> listOfPixels = new ArrayList<Point>();
+	
+	/**
+	 * All voxels contained in a region. 
+	 * For 3D
+	 */
+	public ArrayList<Voxel> listOfVoxels = new ArrayList<Voxel>();
 
 	/**
 	 * Used for synchronization lock during parallel tasks.
@@ -172,6 +179,11 @@ public class Node implements Serializable, Comparable<Node>{
 	 * Number of the smallest points contained in the region.
 	 */
 	public int nbPixels = 0;
+	
+	/**
+	 * Number of the smallest points contained in the region.
+	 */
+	public int nbVoxels = 0;
 
 	/**
 	 * Regrouping neighbors that require updates after a node merging process.
@@ -228,6 +240,11 @@ public class Node implements Serializable, Comparable<Node>{
 	/* For Extrinsic evaluation */
 	public boolean s = false;
 	public int[][] d = new int[2][3];
+
+	/**
+	 * TODO Double for now but should be T
+	 */
+	private ArrayList<Double> values;
 	
 	
 	/**
@@ -251,7 +268,6 @@ public class Node implements Serializable, Comparable<Node>{
 	public Node(int name) { // leaf
 
 		this.name = name;
-		this.listOfPixels = new ArrayList<Point>();
 		this.listOfNeighbors = new ConcurrentHashMap<Node, Adjacency>();
 		this.neighborToTreat = new ConcurrentHashMap<Node, Adjacency>();
 		this.type = TypeOfNode.LEAF;
@@ -343,9 +359,16 @@ public class Node implements Serializable, Comparable<Node>{
 	 * @param y index of the row; should be in [0, imageHeight]
 	 */
 	public void addPixel(int x, int y) {
-		
-		this.listOfPixels.add(new Point(x,y));
+
+		this.listOfPixels.add(new Point(x, y));
 		this.nbPixels++;
+	}
+
+
+	public void addVoxel(int x, int y, int z) {
+		
+		this.listOfVoxels.add(new Voxel(x,y, z));
+		this.nbVoxels++;
 	}
 
 	@Override
@@ -401,9 +424,20 @@ public class Node implements Serializable, Comparable<Node>{
 		
 		return this.listOfPixels;
 	}
+	
+	
+	/**
+	 * For 3D
+	 * @return
+	 */
+	public ArrayList<Voxel> getVoxels() {
+		
+		return this.listOfVoxels;
+	}
 
 	/**
-	 * 
+	 * Carefull, the pixels are now copied from the childs to the parents
+	 * TODO Find a way to resolve it for optimization
 	 * @return The number of pixels in the region (~node)
 	 */
 	public int getSize() { 
@@ -416,6 +450,16 @@ public class Node implements Serializable, Comparable<Node>{
 			
 			return this.nbPixels;
 		}*/
+	}
+	
+	/**
+	 * 
+	 * @return The number of voxels in the region (~node)
+	 */
+	public int getNbVoxels() { 
+		
+		return this.listOfVoxels.size();
+		//return this.nbVoxels;
 	}
 	
 	/**
@@ -535,5 +579,24 @@ public class Node implements Serializable, Comparable<Node>{
 		if(this.rightNode != null)
 			this.rightNode.updateLvl(newLvl -1 );	
 		
+	}
+
+	/**
+	 * Add a value into the node.
+	 * @param <T> the considered type.
+	 * @param t is the value.
+	 */
+	public <T> void addValue(T t) {
+		
+		if (this.values == null) {
+			
+			this.values = new ArrayList<Double>();
+		}
+		this.values.add((Double) t); /* TODO because Double for now but should be T */
+	}
+
+	public ArrayList<Double> getValues() {
+
+		return this.values;
 	}
 }

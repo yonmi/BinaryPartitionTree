@@ -50,13 +50,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import datastructure.Adjacency;
 import datastructure.Node;
 import datastructure.Node.TypeOfNode;
+import datastructure.Tree.TypeOfConnectivity;
 import datastructure.set.SetOfAdjacencies;
 import lang.Strings;
 import standard.parallel.BPTP;
 import standard.parallel.BPTP.Side;
-import standard.sequential.BPT.TypeOfConnectivity;
-import utils.LabelMatrix;
 import utils.Log;
+import utils.d2.LabelMatrix;
 
 public class IndividualTask extends Thread {
 	
@@ -454,7 +454,7 @@ public class IndividualTask extends Thread {
 			
 		}catch(Exception e) {
 			
-			System.err.println("Frontier managing: over flow \n");
+			System.err.println("Frontier managing: over flow /n");
 		}
 	}
 

@@ -48,8 +48,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import datastructure.Adjacency;
 import datastructure.Node;
 import metric.bricks.Metric;
-import utils.LabelMatrix;
 import utils.Log;
+import utils.d2.LabelMatrix;
 
 public class SetOfAdjacencies implements AdjacencySet, Serializable{
 
@@ -125,10 +125,18 @@ public class SetOfAdjacencies implements AdjacencySet, Serializable{
 	public int yMin;
 
 	/**
-	 * Prepares and creates an empty structure. 
+	 * MINIMUM: the lowest value is optimal.
+	 * MAXIMUM: the highest value is optimal.
 	 */
-	public SetOfAdjacencies() { 
+	private OptimalOption optimalOption = OptimalOption.MINIMUM;
+
+	/**
+	 * Prepares and creates an empty structure.
+ 	 * @param optimalOption
+	 */
+	public SetOfAdjacencies(OptimalOption optimalOption) { 
 		
+		this.optimalOption = optimalOption;
 		this.set = new TreeSet<Adjacency>(); 
 	}
 
@@ -181,7 +189,16 @@ public class SetOfAdjacencies implements AdjacencySet, Serializable{
 	@Override
 	public Adjacency optimalAdjacency() { 
 		
-		return this.set.first(); 
+		switch(this.optimalOption) {
+		
+		case MAXIMUM:
+			
+			return this.set.last();		
+			
+		default: // MINIMUM
+			
+			return this.set.first();		
+		}
 	}
 
 	@Override
@@ -200,5 +217,11 @@ public class SetOfAdjacencies implements AdjacencySet, Serializable{
 	public int size() { 
 		
 		return this.set.size(); 
+	}
+
+	@Override
+	public void setOptimalOption(OptimalOption optimalOption) {
+
+		this.optimalOption = optimalOption;
 	}
 }

@@ -45,6 +45,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 import datastructure.Node;
+import datastructure.set.AdjacencySet.OptimalOption;
 import datastructure.set.SetOfAdjacencies;
 import standard.parallel.bricks.IndividualTask;
 import standard.sequential.BPT;
@@ -69,6 +70,12 @@ public class BPTP extends BPT{
 	public HashMap<Side, SetOfAdjacencies> sideResource;
 	public HashMap<Side, IndividualTask> sideTasks;
 	
+	/**
+	 * Precise if the optimal distance value to consider for mergin nodes is the MAXIMUM or the MINIMUM.
+	 */
+	private OptimalOption optimalOption = OptimalOption.MINIMUM; // by default
+
+	
 	public BPTP() {
 		
 		super();
@@ -90,28 +97,28 @@ public class BPTP extends BPT{
 	
 		/* Prepare set of adjacencies structures */
 		this.setOfAdjacencies = null;
-		SetOfAdjacencies adjaSet1 = new SetOfAdjacencies();
+		SetOfAdjacencies adjaSet1 = new SetOfAdjacencies(this.optimalOption);
 		adjaSet1.currentNodeIndex = 0;
 		adjaSet1.xMin = 0;
 		adjaSet1.xMax = verticalFrontier;
 		adjaSet1.yMin = 0;
 		adjaSet1.yMax = horizontalFrontier;
 	
-		SetOfAdjacencies adjaSet2 = new SetOfAdjacencies();
+		SetOfAdjacencies adjaSet2 = new SetOfAdjacencies(this.optimalOption);
 		adjaSet2.currentNodeIndex = 0;
 		adjaSet2.xMin = verticalFrontier;
 		adjaSet2.xMax = this.image.getWidth();
 		adjaSet2.yMin = 0;
 		adjaSet2.yMax = horizontalFrontier;
 	
-		SetOfAdjacencies adjaSet3 = new SetOfAdjacencies();
+		SetOfAdjacencies adjaSet3 = new SetOfAdjacencies(this.optimalOption);
 		adjaSet3.currentNodeIndex = 0;
 		adjaSet3.xMin = 0;
 		adjaSet3.xMax = verticalFrontier;
 		adjaSet3.yMin = horizontalFrontier;
 		adjaSet3.yMax = this.image.getHeight();
 	
-		SetOfAdjacencies adjaSet4 = new SetOfAdjacencies();
+		SetOfAdjacencies adjaSet4 = new SetOfAdjacencies(this.optimalOption);
 		adjaSet4.currentNodeIndex = 0;
 		adjaSet4.xMin = verticalFrontier;
 		adjaSet4.xMax = this.image.getWidth();

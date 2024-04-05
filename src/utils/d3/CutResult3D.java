@@ -39,11 +39,14 @@
 * The full license is in the file LICENSE, distributed with this software.  
 *****************************************************************************/
 
-package datastructure;
+package utils.d3;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+import datastructure.Node;
+import datastructure.d3.Tree3D;
 
 /**
  * A cut performed on a BPT gives a partition regrouping regions at a precised hierarchy level.
@@ -55,17 +58,17 @@ import java.util.TreeMap;
  * <li> a set of regions at each level
  *
  */
-public class CutResult {
+public class CutResult3D {
 
 	/**
 	 * Hierarchical structure owning the cutting results.
 	 */
-	public Tree tree;
+	public Tree3D tree3D;
 	
 	/**
 	 * Set of partitions for each level. 
 	 */
-	public TreeMap<Integer, BufferedImage> regionImages;
+	public TreeMap<Integer, BufferedImage> partitions;
 	
 	/**
 	 * Set of regions contained in a partition for each level.
@@ -79,11 +82,11 @@ public class CutResult {
 	 * 
 	 * @throws NullPointerException if tree is null
 	 */
-	public CutResult(Tree tree) {
+	public CutResult3D(Tree3D tree3D) {
 
-		this.tree = tree;
-		regionImages = new TreeMap<Integer, BufferedImage>();
-		relatedNodes = new TreeMap<Integer, ArrayList<Node>>();
+		this.tree3D = tree3D;
+		this.partitions = new TreeMap<Integer, BufferedImage>();
+		this.relatedNodes = new TreeMap<Integer, ArrayList<Node>>();
 	}
 	
 	/**
@@ -99,8 +102,8 @@ public class CutResult {
 		
 		ArrayList<Node> list = new ArrayList<Node>();
 		list.addAll(activeNodesList);
-		regionImages.put(nbRegions, regionImage);
-		relatedNodes.put(nbRegions, list);
+		this.partitions.put(nbRegions, regionImage);
+		this.relatedNodes.put(nbRegions, list);
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class CutResult {
 	 */
 	public BufferedImage get(int nbRegions) { 
 		
-		return regionImages.get(nbRegions); 
+		return partitions.get(nbRegions); 
 	}
 
 	/**
@@ -130,7 +133,7 @@ public class CutResult {
 	 */
 	public void remove(int nbRegions) {
 		
-		regionImages.remove(nbRegions);
+		partitions.remove(nbRegions);
 		relatedNodes.remove(nbRegions);
 	}
 }

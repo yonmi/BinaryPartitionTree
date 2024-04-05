@@ -39,13 +39,14 @@
 * The full license is in the file LICENSE, distributed with this software.  
 *****************************************************************************/
 
-package metric.bricks;
+package metric.bricks.d3;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import datastructure.Node;
+import metric.bricks.MetricInterface;
 import utils.Log;
+import utils.d3.RGBStruct;
 
 /**
  * 
@@ -53,11 +54,11 @@ import utils.Log;
  * (!) All metric classes must implement the interface 'MetricInterface' and override all its methods.
  * 
  */
-public class Metric implements MetricInterface{
+public class Metric3D implements MetricInterface{
 
 	public enum Context{
 		
-		METRIC
+		METRIC_3D
 	}
 	
 	/**
@@ -68,7 +69,7 @@ public class Metric implements MetricInterface{
 	/**
 	 * Image of interest
 	 */
-	public BufferedImage img;
+	public RGBStruct cube;
 	
 	/**
 	 * Specific parameters of the metric.
@@ -88,37 +89,7 @@ public class Metric implements MetricInterface{
 	 */
 	public static enum TypeOfMetric{
 		
-		RADIOMETRIC_MIN_MAX,
-		RADIOMETRIC_AVERAGE,
-		VECTORIAL_DISTANCE,
-		PRECISED_ELONGATION,
-		SIMPLE_ELONGATION,
-		FAST_ELONGATION,
-		SMOOTHNESS,
-		FAST_SMOOTHNESS,
-		FAST_COMPACTNESS,
-		NDVI,
-		NDWI,
-		COOCC_MATRIX,
-		CL_MM_NDVI,
-		CL_MM_NDWI,
-		CL_MM_COMPACTNESS,
-		CL_MM_NDVI_NDWI,
-		CL_MM_FEL_NDVI,
-		CL_MM_FEL_NDVI_NDWI, 
-
-		ORANDOM,
-		OMIN_MAX,
-		OMSE, 
-		OWSDM, 
-		OCOL_CONT_MIN_MAX,
-		OCOL_CONT_MSE, 
-		OCOL_CONT_MSE_LAB,
-		OCOL_CONT_WSDM,
-		
-		OMSE_LAB, 
-		OCONTOUR,
-		OCOL_CONT
+		OMIN_MAX_3D
 	}
 	
 	/**
@@ -132,7 +103,7 @@ public class Metric implements MetricInterface{
 	@Override
 	public double computeDistances(Node n1, Node n2) {
 	
-		System.err.println(Context.METRIC +"[WARNING] the method 'agat.metric.bricks.MetricInterface.computeDistances(Node n1, Node n2)' is not implemented!");
+		System.err.println(Context.METRIC_3D +"[WARNING] the method 'agat.metric.bricks.MetricInterface.computeDistances(Node n1, Node n2)' is not implemented!");
 		System.exit(0);
 		
 		return Double.MAX_VALUE;
@@ -147,7 +118,7 @@ public class Metric implements MetricInterface{
 	@Override
 	public void initMF(Node n) {
 
-		System.err.println(String.valueOf(Context.METRIC) +"[WARNING] the method 'agat.metric.bricks.MetricInterface.prepareMf(Node n)' is not implemented!");
+		System.err.println(String.valueOf(Context.METRIC_3D) +"[WARNING] the method 'agat.metric.bricks.MetricInterface.prepareMf(Node n)' is not implemented!");
 		System.exit(0);
 		
 	}
@@ -190,7 +161,7 @@ public class Metric implements MetricInterface{
 	@Override
 	public void updateMF(Node n) {
 
-		System.err.println(String.valueOf(Context.METRIC) +"[WARNING] the method 'agat.metric.bricks.MetricInterface.updateMF(Node n)' is not implemented!");
+		System.err.println(String.valueOf(Context.METRIC_3D) +"[WARNING] the method 'agat.metric.bricks.MetricInterface.updateMF(Node n)' is not implemented!");
 		System.exit(0);
 	}
 }
