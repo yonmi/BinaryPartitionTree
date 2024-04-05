@@ -151,7 +151,7 @@ public class SaveBPT {
 			tree.setProgress(0);
 			PrintWriter writer = new PrintWriter(tree.getDirectory() +"//"+ tree.getName(), "UTF-8");
 			
-			writer.print("strict graph bpt{");
+			writer.print("digraph bpt{");
 			
 			Node[] nodes =  tree.getNodes();
 			for(int n = 0; n < nodes.length; n++) {
@@ -169,8 +169,8 @@ public class SaveBPT {
 
 				if(node.leftNode != null) {
 					
-					writer.print(node.name +" -- "+ left.name +";");
-					writer.print(node.name +" -- "+ right.name +";");
+					writer.print(node.name +" -> "+ left.name +";");
+					writer.print(node.name +" -> "+ right.name +";");
 					
 				}
 			}
