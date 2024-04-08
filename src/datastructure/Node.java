@@ -244,7 +244,7 @@ public class Node implements Serializable, Comparable<Node>{
 	/**
 	 * TODO Double for now but should be T
 	 */
-	private ArrayList<Double> values;
+	private ArrayList<Object> values;
 	
 	
 	/**
@@ -590,12 +590,12 @@ public class Node implements Serializable, Comparable<Node>{
 		
 		if (this.values == null) {
 			
-			this.values = new ArrayList<Double>();
+			this.values = new ArrayList<Object>();
 		}
 		this.values.add((Double) t); /* TODO because Double for now but should be T */
 	}
 
-	public ArrayList<Double> getValues() {
+	public ArrayList<Object> getValues() {
 
 		return this.values;
 	}

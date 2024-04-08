@@ -119,7 +119,7 @@ public class CooccurrenceMatrixMetric<T> extends Metric implements MetricInterfa
 
 			/* Get the first value and assign it as a feature.
 			 * It will be used later as an id of the node in order to create the couples needed in the cooccurrency matrix */
-			n.features.put(this.attributePos, n.getValues().get(0));
+			n.features.put(this.attributePos, (Double) n.getValues().get(0));
 			break;
 		default: /* Node or root */
 			
