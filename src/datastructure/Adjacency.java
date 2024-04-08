@@ -326,6 +326,15 @@ public class Adjacency implements Comparable<Adjacency>{
 			this.node2 = node1;
 		}
 	}
+	
+	/**
+	 * Return a String: node1_node2.</br>
+	 */
+	@Override
+	public String toString() {
+		
+		return this.node1.name +"_"+ this.node2.name;
+	}
 
 	/**
 	 * States that the adjacency, that has an unique index, is not stored anywhere

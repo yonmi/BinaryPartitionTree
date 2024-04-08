@@ -431,8 +431,9 @@ public class BPT<T> implements Tree, Serializable{
 	 */
 	@Override
 	public void add(Adjacency adjacency) {
-		
-		adjacency.computeDistance(this.metric);
+
+		/* The score determines the position of the adjacency in the dedicated data structure */
+		adjacency.computeDistance(this.metric); 
 		this.setOfAdjacencies.add(adjacency);
 	}
 
@@ -491,7 +492,6 @@ public class BPT<T> implements Tree, Serializable{
 	 * @param leaf
 	 */
 	private void createRAGFromValueSet(Node leaf) {
-		// TODO Auto-generated method stub
 		
 		switch(this.connectivity) {
 			
@@ -592,8 +592,6 @@ public class BPT<T> implements Tree, Serializable{
 	 * @param estimatedNbLeaves
 	 */
 	private void defineLeavesFromValueSet(int estimatedNbLeaves) {
-		
-		/* TODO No preset for now */
 		
 		/* Prepare the list of leaves */
 		this.nodes = new Node[estimatedNbLeaves];
@@ -977,7 +975,7 @@ public class BPT<T> implements Tree, Serializable{
 			Log.println(context +"_FUSION", this.progress +"%");
 			
 			Adjacency potentialAdjacency = this.setOfAdjacencies.optimalAdjacency();
-			Log.println(context +"_FUSION", "Optimal Score: "+ potentialAdjacency.distance);
+			Log.println(context +"_FUSION", potentialAdjacency.toString() +" Optimal Score: "+ potentialAdjacency.distance);
 	
 			/* Create a new node */
 			Node leftNode = potentialAdjacency.node1;
@@ -1006,6 +1004,7 @@ public class BPT<T> implements Tree, Serializable{
 				Node neighbor = entry.getKey();
 				Adjacency adjacency = new Adjacency(neighbor, newNode);
 				this.add(adjacency);
+				System.out.println("test");
 			}	
 	
 			/* Remove the adjacencies corresponding to the left node*/

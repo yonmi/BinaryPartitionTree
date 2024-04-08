@@ -159,7 +159,7 @@ public class CooccurrenceMatrixMetric<T> extends Metric implements MetricInterfa
 				this.cooccMatrix.put(newCouple, newValue);
 			}
 		}
-		this.cooccMatrix.print();
-		System.out.println("coocc size: "+ this.cooccMatrix.size());
+//		this.cooccMatrix.print();
+//		System.out.println("coocc size: "+ this.cooccMatrix.size());
 	}
 }

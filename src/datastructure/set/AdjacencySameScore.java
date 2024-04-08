@@ -41,7 +41,7 @@
 
 package datastructure.set;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import datastructure.Adjacency;
@@ -56,7 +56,7 @@ public class AdjacencySameScore implements Comparable<AdjacencySameScore>{
 	public AdjacencySameScore(double distance) {
 
 		this.score = distance;
-		this.bucket = new HashSet<Adjacency>();
+		this.bucket = new LinkedHashSet<Adjacency>();
 	}
 
 	public boolean add(Adjacency adjacency) {
