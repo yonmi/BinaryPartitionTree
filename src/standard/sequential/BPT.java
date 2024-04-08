@@ -1004,7 +1004,6 @@ public class BPT<T> implements Tree, Serializable{
 				Node neighbor = entry.getKey();
 				Adjacency adjacency = new Adjacency(neighbor, newNode);
 				this.add(adjacency);
-				System.out.println("test");
 			}	
 	
 			/* Remove the adjacencies corresponding to the left node*/
